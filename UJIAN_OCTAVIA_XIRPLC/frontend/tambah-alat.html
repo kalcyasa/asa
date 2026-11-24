@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./src/output.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-300 text-gray-800">
+  <div id="aplikasiAlat" class="block">
+    <header
+      class="fixed top-0 left-0 right-0 h-20 bg-blue-300 text-grey border-b-2 border-gray-900 z-40 flex items-center justify-between px-4 md:px-7">
+      <h1 class="text-xl md:text-2xl font-bold">PEMINJAMAN ALAT</h1>
+      <div class="flex items-center gap-3"></div>
+    </header>
+
+    <aside class="fixed left-0 top-20 bottom-0 w-56 md:w-64 bg-gray-100 border-r-2 border-gray-400 z-30">
+      <a href="alat.html"
+        class="flex items-center w-full h-14 md:h-16 text-sm md:text-lg border-b border-gray-400 hover:bg-blue-100 font-bold text-left px-6">ALAT</a>
+
+      <a href="kategori.html"
+        class="flex items-center w-full h-14 md:h-20 text-sm md:text-lg border-b border-gray-400 hover:bg-blue-100 font-bold text-left px-6">KATEGORI
+        ALAT</a>
+
+      <a href="peminjaman.html"
+        class="flex items-center w-full h-14 md:h-20 text-sm md:text-lg border-b border-gray-400 hover:bg-blue-100 font-bold text-left px-6">PEMINJAMAN</a>
+    </aside>
+
+    <main class="ml-56 md:ml-64 pt-20 min-h-screen bg-gray-200">
+        <div id="isiHalamanAdmin" class="p-4 md:p-8">
+           <form id="form-alat">
+                    <div class="bg-white w-full max-w-2xl p-6 md:p-8 shadow-lg rounded-xl">
+                        <h2 class="text-2xl font-bold mb-6">Tambah Alat Baru</h2>
+                        <div></div>
+                        <div class="space-y-4">
+
+                        </div>
+                            <div>
+                                <label class="font-semibold">Nama Alat</label>
+                                <input type="text" id="nama_alat" class="w-full border border-gray-400 rounded px-4 py-3 mt-1">
+                            </div>
+                            <div>
+                                <label class="font-semibold">Kondisi</label>
+                                <input type="text" id="kondisi" class="w-full border border-gray-400 rounded px-4 py-3 mt-1">
+                            </div>
+                            <div>
+                                <label class="font-semibold">Stok</label>
+                                <input type="number" id="stok" class="w-full border border-gray-400 rounded px-4 py-3 mt-1">
+                            </div>
+                            <div>
+                                <label class="font-semibold">Lokasi</label>
+                                <textarea id="lokasi" rows="3" class="w-full border border-gray-400 rounded px-4 py-3 mt-1"></textarea>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="font-semibold">Kategori</label>
+                                <select
+                                    id="id_kategori"
+                                    class="w-full border border-gray-400 rounded px-4 py-3 mt-1 p-2 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-300">
+                                    <option value="" disabled selected hidden>Pilih Kategori</option>
+                                    <option value="1">Komputer & Jaringan</option>
+                                    <option value="2">Multimedia</option>
+                                    <option value="3">Elektronika</option>
+                                </select>
+                            </div>
+
+                            <div id="message-area"></div>
+                            
+                            <div class="flex gap-3 mt-6">
+                                <button type="button" onclick="bukaHalamanData('alat')" class="bg-gray-300 px-5 py-2 rounded">Batal</button>
+                                <button class="bg-blue-300 hover:bg-blue-400 px-5 py-2 rounded font-bold">Simpan</button>
+                            </div>
+                        </div>
+                    </div>
+                  </form>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Logika Simpan Data Form
+    const formAlat = document.getElementById("form-alat");
+    const messageArea = document.getElementById("message-area");
+    if (formAlat) formAlat.addEventListener("submit", async function (event) {
+      event.preventDefault(); // Mencegah browser reload halaman
+      const alatData = {
+        nama_alat: document.getElementById("nama_alat").value,
+        kondisi: (document.getElementById("kondisi").value),
+        stok: Number(document.getElementById("stok").value),
+        lokasi: document.getElementById("lokasi").value,
+        id_kategori: Number(document.getElementById("id_kategori").value),
+      };
+      if (!alatData.id_kategori) {
+        alert("Pilih kategori terlebih dahulu!");
+        return;
+      }
+      try {
+        const response = await fetch("http://localhost:3000/api/alat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+
+          body: JSON.stringify(alatData),
+        });
+        const result = await response.json();
+        if (response.status === 201) {
+          messageArea.innerHTML = `<p style="color: green; padding: 10px; font-weight: bold;">Berhasil: ${result.message}</p>`;
+
+          formAlat.reset(); // Kosongkan input form
+          // PERBARUI TABEL OTOMATIS TANPA F5!
+          // Sembunyikan pesan setelah 2 detik
+          setTimeout(() => {
+            messageArea.innerHTML = "";
+          }, 2000);
+        } else {
+          messageArea.innerHTML = `<p style="color: red;">Gagal:${result.message}</p>`;
+        }
+      } catch (error) {
+        messageArea.innerHTML = `<p style="color: red;">Koneksi gagal. Pastikan backend aktif.</p>`;
+      }
+    });
+    </script>
+  </body>
+</html>
